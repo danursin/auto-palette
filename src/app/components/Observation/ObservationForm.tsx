@@ -1,24 +1,10 @@
 import { Button, Grid } from "semantic-ui-react";
-import React, { useCallback, useState } from "react";
+import { Color, SessionItem } from "@/types";
+import React, { useCallback } from "react";
 
-import { Color } from "@/types";
-import { ObservationPostRequest } from "../../api/observation/route";
+import { ObservationPostRequest } from "../../api/session/observation/route";
 
-const COLORS: Color[] = [
-    "BLACK",
-    "BLUE",
-    "BROWN",
-    "GREEN",
-    "GREY",
-    "ORANGE",
-    //"OTHER",
-    "PINK",
-    "PURPLE",
-    "RED",
-    "SILVER",
-    "WHITE",
-    "YELLOW"
-];
+const COLORS: Color[] = ["BLACK", "BLUE", "BROWN", "GREEN", "GREY", "ORANGE", "PINK", "PURPLE", "RED", "SILVER", "WHITE", "YELLOW"];
 
 const colorTextMap: Partial<Record<Color, "black" | "white">> = {
     BLACK: "white",
@@ -27,7 +13,6 @@ const colorTextMap: Partial<Record<Color, "black" | "white">> = {
     GREEN: "white",
     GREY: "white",
     ORANGE: "black",
-    //OTHER: "black",
     PINK: "black",
     PURPLE: "white",
     RED: "white",
@@ -37,29 +22,19 @@ const colorTextMap: Partial<Record<Color, "black" | "white">> = {
 };
 
 interface ObservationFormProps {
+    session: SessionItem;
     onColorSave: (color: Color) => void;
 }
 
-const ObservationForm: React.FC<ObservationFormProps> = ({ onColorSave }) => {
-    const [position, setPosition] = useState<GeolocationPosition | null>(null);
+const ObservationForm: React.FC<ObservationFormProps> = ({ session, onColorSave }) => {
     const onColorClick = useCallback(
         async (color: Color) => {
             onColorSave(color);
-            let currentLocation = position;
-            if (!currentLocation) {
-                currentLocation = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject);
-                });
-                setPosition(currentLocation);
-            }
             const req: ObservationPostRequest = {
                 color: color,
-                location: {
-                    latitude: currentLocation.coords.latitude,
-                    longitude: currentLocation.coords.longitude
-                }
+                key: session.SK
             };
-            const response = await fetch("/api/observation", {
+            const response = await fetch("/api/session/observation", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -71,7 +46,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onColorSave }) => {
                 alert("Failed to submit observation");
             }
         },
-        [onColorSave, position]
+        [onColorSave, session.SK]
     );
 
     return (
@@ -79,6 +54,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onColorSave }) => {
             <Grid doubling columns={4} stackable>
                 <Grid.Row>
                     {COLORS.map((color) => {
+                        const count = session.ColorMap[color];
                         return (
                             <Grid.Column key={color} width={4} style={{ paddingBottom: "1em", minHeight: "60px" }}>
                                 <Button
@@ -87,7 +63,7 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ onColorSave }) => {
                                     style={{ backgroundColor: color, color: colorTextMap[color], minHeight: "50px" }}
                                     onClick={() => onColorClick(color)}
                                 >
-                                    {color}
+                                    {color} {count ? `(${count})` : undefined}
                                 </Button>
                             </Grid.Column>
                         );

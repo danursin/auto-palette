@@ -1,5 +1,7 @@
 import "semantic-ui-css/semantic.min.css";
 
+import { Grid, Menu, MenuItem } from "semantic-ui-react";
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,7 +16,16 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>{children}</body>
+            <body>
+                <Menu>
+                    <MenuItem icon="car" header content="Auto Palette" />
+                </Menu>
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column>{children}</Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </body>
         </html>
     );
 }
