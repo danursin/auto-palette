@@ -21,7 +21,7 @@ export default function RootLayout({
                 <Menu>
                     <MenuItem icon="car" header as={Link} href="/" content="Auto Palette" />
                 </Menu>
-                <Grid>
+                <Grid padded="horizontally">
                     <Grid.Row>
                         <Grid.Column>{children}</Grid.Column>
                     </Grid.Row>

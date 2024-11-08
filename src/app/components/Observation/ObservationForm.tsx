@@ -4,7 +4,19 @@ import React, { useCallback } from "react";
 
 import { ObservationPostRequest } from "../../api/session/observation/route";
 
-const COLORS: Color[] = ["BLACK", "BLUE", "BROWN", "GREEN", "GREY", "ORANGE", "PINK", "PURPLE", "RED", "SILVER", "WHITE", "YELLOW"];
+// const COLORSArray: Color[][] = [
+//     ["BLACK", "BLUE", "BROWN"],
+//     ["GREEN", "GREY", "ORANGE"],
+//     ["PINK", "PURPLE", "RED"],
+//     ["SILVER", "WHITE", "YELLOW"]
+// ];
+
+const COLORSArray: Color[][] = [
+    ["RED", "ORANGE", "YELLOW"],
+    ["GREEN", "BLUE", "PURPLE"],
+    ["BROWN", "GREY", "BLACK"],
+    ["WHITE", "SILVER", "PINK"]
+];
 
 const colorTextMap: Partial<Record<Color, "black" | "white">> = {
     BLACK: "white",
@@ -50,27 +62,31 @@ const ObservationForm: React.FC<ObservationFormProps> = ({ session, onColorSave 
     );
 
     return (
-        <div>
-            <Grid doubling columns={4} stackable>
-                <Grid.Row>
-                    {COLORS.map((color) => {
-                        const count = session.ColorMap[color];
-                        return (
-                            <Grid.Column key={color} width={4} style={{ paddingBottom: "1em", minHeight: "60px" }}>
-                                <Button
-                                    type="button"
-                                    fluid
-                                    style={{ backgroundColor: color, color: colorTextMap[color], minHeight: "50px" }}
-                                    onClick={() => onColorClick(color)}
-                                >
-                                    {color} {count ? `(${count})` : undefined}
-                                </Button>
-                            </Grid.Column>
-                        );
-                    })}
-                </Grid.Row>
-            </Grid>
-        </div>
+        <Grid>
+            {COLORSArray.map((row, index) => {
+                return (
+                    <Grid.Row key={index} columns={3} stretched>
+                        {row.map((color) => {
+                            const count = session.ColorMap[color];
+                            return (
+                                <Grid.Column key={color} style={{ paddingBottom: "1em", minHeight: "60px" }}>
+                                    <Button
+                                        type="button"
+                                        fluid
+                                        style={{ backgroundColor: color, color: colorTextMap[color], minHeight: "50px" }}
+                                        onClick={() => onColorClick(color)}
+                                    >
+                                        {color}
+                                        <br />
+                                        {count ?? 0}
+                                    </Button>
+                                </Grid.Column>
+                            );
+                        })}
+                    </Grid.Row>
+                );
+            })}
+        </Grid>
     );
 };
 
