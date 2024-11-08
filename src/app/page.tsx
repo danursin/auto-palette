@@ -130,9 +130,9 @@ const Home: React.FC = () => {
             <Table selectable unstackable>
                 <Table.Header>
                     <Table.Row>
-                        <Table.HeaderCell content="Name" />
-                        <Table.HeaderCell content="Started" />
-                        <Table.HeaderCell content="Observations" />
+                        <Table.HeaderCell content="Name" width={8} />
+                        <Table.HeaderCell content="Date" />
+                        <Table.HeaderCell content="#" />
                         <Table.HeaderCell />
                     </Table.Row>
                 </Table.Header>
@@ -145,14 +145,7 @@ const Home: React.FC = () => {
                             <Table.Cell content={new Date(session.Date).toLocaleDateString()} />
                             <Table.Cell content={session.ObservationCount} />
                             <Table.Cell>
-                                <Button
-                                    icon="trash"
-                                    color="red"
-                                    size="tiny"
-                                    type="button"
-                                    content="Delete"
-                                    onClick={() => handleOnDelete(session)}
-                                />
+                                <Button icon="trash" color="red" size="tiny" type="button" onClick={() => handleOnDelete(session)} />
                             </Table.Cell>
                         </Table.Row>
                     ))}
