@@ -127,7 +127,7 @@ const Home: React.FC = () => {
                     </Form>
                 </Modal.Content>
             </Modal>
-            <Table selectable>
+            <Table selectable unstackable>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell content="Name" />
