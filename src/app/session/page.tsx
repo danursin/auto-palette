@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { APIResponse, Color, SessionItem } from "@/types";
 import React, { Suspense, useEffect, useState } from "react";
 
@@ -41,7 +43,7 @@ const SessionDetails: React.FC = () => {
     };
 
     return (
-        <Suspense>
+        <Suspense fallback={<p>Loading...</p>}>
             <main>
                 {!session && <p>Loading...</p>}
 
