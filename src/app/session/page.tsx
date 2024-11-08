@@ -1,7 +1,7 @@
 "use client";
 
 import { APIResponse, Color, SessionItem } from "@/types";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 
 import ColorChart from "../components/ColorChart";
 import { Divider } from "semantic-ui-react";
@@ -41,7 +41,7 @@ const SessionDetails: React.FC = () => {
     };
 
     return (
-        <div>
+        <Suspense>
             <main>
                 {!session && <p>Loading...</p>}
 
@@ -56,7 +56,7 @@ const SessionDetails: React.FC = () => {
                     </>
                 )}
             </main>
-        </div>
+        </Suspense>
     );
 };
 
