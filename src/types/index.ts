@@ -9,7 +9,9 @@ export type SessionItem = {
     /** Item type, fixed to "Session" */
     Type: "SESSION";
     /** Location metadata for the session */
-    Location: Partial<GeolocationCoordinates>;
+    Location?: Partial<GeolocationCoordinates>;
+    /** Count of observations in the session */
+    ObservationCount: number;
     /** Human-readable name for the session */
     FriendlyName: string;
     /** Map holding counts of cars by color for the session */

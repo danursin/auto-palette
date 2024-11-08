@@ -6,17 +6,16 @@ import React, { useEffect, useState } from "react";
 import ColorChart from "../components/ColorChart";
 import { Divider } from "semantic-ui-react";
 import ObservationForm from "../components/Observation/ObservationForm";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 const SessionDetails: React.FC = () => {
     const [session, setSession] = useState<SessionItem>();
-    const router = useRouter();
-    const { key } = router.query;
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         (async () => {
             const baseUrl = "/api/session/get";
-            const query = new URLSearchParams({ key: key as string });
+            const query = new URLSearchParams({ key: searchParams.get("key") as string });
             const response = await fetch(`${baseUrl}?${query}`);
             const data = (await response.json()) as APIResponse<SessionItem>;
             if ("error" in data) {
@@ -25,7 +24,7 @@ const SessionDetails: React.FC = () => {
             }
             setSession(data.data);
         })();
-    }, [key]);
+    }, [searchParams]);
 
     const onColorSave = (color: Color) => {
         if (!session) {
@@ -48,6 +47,9 @@ const SessionDetails: React.FC = () => {
 
                 {!!session && (
                     <>
+                        <h1>{session.FriendlyName}</h1>
+                        <p>{session.Description}</p>
+
                         <ObservationForm session={session} onColorSave={onColorSave} />
                         <Divider />
                         <ColorChart data={session.ColorMap} />

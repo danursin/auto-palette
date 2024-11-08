@@ -4,15 +4,19 @@ import { APIResponse, SessionItem } from "@/types";
 import { Button, Form, Modal, Table } from "semantic-ui-react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import { CreateSessionRequest } from "./api/session/create/route";
 import Link from "next/link";
 import { SearchPlaceIndexForPositionResponse } from "@aws-sdk/client-location";
+import { useRouter } from "next/navigation";
 
 const Home: React.FC = () => {
     const [sessions, setSessions] = useState<SessionItem[]>();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [note, setNote] = useState<string>();
-    const [friendlyName, setFriendlyName] = useState<string>();
+    const [note, setNote] = useState<string>("");
+    const [friendlyName, setFriendlyName] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [location, setLocation] = useState<GeolocationCoordinates>();
+    const router = useRouter();
 
     useEffect(() => {
         (async () => {
@@ -36,6 +40,7 @@ const Home: React.FC = () => {
             navigator.geolocation.getCurrentPosition(resolve, reject);
         });
 
+        setLocation(location.coords);
         const response = await fetch(`/api/geocode?lat=${location.coords.latitude}&lng=${location.coords.longitude}`);
         const data = (await response.json()) as APIResponse<SearchPlaceIndexForPositionResponse>;
         setLoading(false);
@@ -48,7 +53,48 @@ const Home: React.FC = () => {
         setFriendlyName(data.data.Results?.[0].Place?.Label ?? "Unknown Location");
     }, []);
 
-    const handleOnSubmit = useCallback(async () => {}, []);
+    const handleOnSubmit = useCallback(async () => {
+        const request: CreateSessionRequest = {
+            Description: note,
+            FriendlyName: friendlyName,
+            Location: {
+                longitude: location?.longitude ?? 0,
+                latitude: location?.latitude ?? 0
+            }
+        };
+        const response = await fetch("/api/session/create", {
+            method: "POST",
+            body: JSON.stringify(request),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = (await response.json()) as APIResponse<SessionItem>;
+        if ("error" in data) {
+            console.error("Failed to create session", data.error);
+            return;
+        }
+        const newSession = data.data;
+        router.push(`/session?key=${encodeURIComponent(newSession.SK)}`);
+    }, [friendlyName, location?.latitude, location?.longitude, note, router]);
+
+    const handleOnDelete = useCallback(async (session: SessionItem) => {
+        if (!confirm("Are you sure you want to delete this session?")) {
+            return;
+        }
+
+        const response = await fetch(`/api/session/destroy?key=${encodeURIComponent(session.SK)}`, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            alert("Failed to delete session");
+            return;
+        }
+
+        setSessions((sessions) => sessions?.filter((s) => s.SK !== session.SK));
+    }, []);
 
     if (!sessions) {
         return <p>Loading...</p>;
@@ -85,16 +131,29 @@ const Home: React.FC = () => {
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell content="Name" />
-                        <Table.HeaderCell content="Date" />
+                        <Table.HeaderCell content="Started" />
+                        <Table.HeaderCell content="Observations" />
+                        <Table.HeaderCell />
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
                     {sessions.map((session) => (
                         <Table.Row key={session.SK}>
                             <Table.Cell>
-                                <Link href={`/session?key=${session.SK}`}>{session.FriendlyName}</Link>
+                                <Link href={`/session?key=${encodeURIComponent(session.SK)}`}>{session.FriendlyName}</Link>
                             </Table.Cell>
                             <Table.Cell content={new Date(session.Date).toLocaleDateString()} />
+                            <Table.Cell content={session.ObservationCount} />
+                            <Table.Cell>
+                                <Button
+                                    icon="trash"
+                                    color="red"
+                                    size="tiny"
+                                    type="button"
+                                    content="Delete"
+                                    onClick={() => handleOnDelete(session)}
+                                />
+                            </Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

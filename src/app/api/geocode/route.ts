@@ -10,8 +10,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<APIRespons
         const lng = request.nextUrl.searchParams.get('lng') as string;
         const response = await locationClient.send(
             new SearchPlaceIndexForPositionCommand({
-                IndexName: 'PlaceIndex',
-                Position: [parseFloat(lng), parseFloat(lat)]
+                IndexName: 'PlaceIndexEsri',
+                Position: [parseFloat(lng), parseFloat(lat)],
+                MaxResults: 1
             })
         );
     

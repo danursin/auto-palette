@@ -19,6 +19,7 @@ export async function POST(request: Request): Promise<NextResponse<APIResponse<S
             Date: now,
             FriendlyName,
             Location,
+            ObservationCount: 0,
             ColorMap: {}
         };
 

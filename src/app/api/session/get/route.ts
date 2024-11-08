@@ -7,6 +7,7 @@ import { GetCommand } from '@aws-sdk/lib-dynamodb';
 export async function GET(request: NextRequest): Promise<NextResponse<APIResponse<SessionItem>>> {
     try {
         const key = request.nextUrl.searchParams.get('key');
+        console.log(`Fetching key: ${key}`);
         const response = await dynamodb.send(
             new GetCommand({
                 TableName: TABLE_NAME,

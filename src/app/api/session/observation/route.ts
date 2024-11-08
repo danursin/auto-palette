@@ -19,15 +19,16 @@ export async function POST(request: Request): Promise<NextResponse<APIResponse<S
                 PK: 'SESSION',
                 SK: key
             },
-            UpdateExpression: 'ADD #Counts.#Color :one',
+            UpdateExpression: 'ADD #ColorMap.#Color :one, #Counts :one',
             ExpressionAttributeNames: {
-                '#Counts': 'ColorMap',
-                '#Color': color
+                '#ColorMap': 'ColorMap',
+                '#Color': color,
+                '#Counts': 'ObservationCount'
             },
             ExpressionAttributeValues: {
                 ':one': 1
             },
-            ReturnValues: "UPDATED_NEW"
+            ReturnValues: "ALL_NEW"
         }));
 
         return NextResponse.json({ data: response.Attributes as SessionItem });
